@@ -39,9 +39,9 @@
           body: JSON.stringify({ image: base64Image })
         });
 
-        const data = await response.json();
-        console.log("API Response:", data);
-        document.getElementById("prediction").innerText = "Prediction: " + data.prediction;
+       const data = await response.json();
+       const result = JSON.parse(data.body);  // 👈 parse the body string
+       document.getElementById("prediction").innerText = "Prediction: " + result.prediction;
       };
 
       reader.readAsDataURL(file);
