@@ -6,6 +6,134 @@
   <title>Brain Tumor Prediction</title>
   <style>
     body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0d1117;
+      color: #f0f6fc;
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    h2 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      color: #58a6ff;
+    }
+
+    input[type="file"] {
+      margin: 20px 0;
+      padding: 10px;
+      border: 1px solid #30363d;
+      border-radius: 5px;
+      background-color: #161b22;
+      color: #f0f6fc;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #238636;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #2ea043;
+    }
+
+    #prediction {
+      margin-top: 30px;
+      font-size: 20px;
+      font-weight: bold;
+      background-color: #161b22;
+      border: 1px solid #30363d;
+      padding: 20px;
+      width: 80%;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🧠 Brain Tumor Detection</h2>
+  <input type="file" id="imageInput" accept="image/*"><br>
+  <button onclick="uploadImage()">📤 Predict</button>
+  <div id="prediction">Upload an image to get prediction</div>
+
+  <script>
+    async function uploadImage() {
+      const file = document.getElementById('imageInput').files[0];
+      if (!file) return alert("Please select an image!");
+
+      const reader = new FileReader();
+      reader.onload = function () {
+        const img = new Image();
+        img.onload = async function () {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+
+          canvas.toBlob(async function (blob) {
+            const blobReader = new FileReader();
+            blobReader.onloadend = async function () {
+              const base64Image = blobReader.result.split(',')[1];
+
+              try {
+                const response = await fetch('https://btkvf1loal.execute-api.us-east-1.amazonaws.com/pre/predict', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ image: base64Image })
+                });
+
+                const data = await response.json();
+                console.log("API Response:", data);
+
+                let prediction;
+                if (typeof data.body === "string") {
+                  const parsed = JSON.parse(data.body);
+                  prediction = parsed.prediction;
+                } else {
+                  prediction = data.prediction;
+                }
+
+                document.getElementById("prediction").innerText =
+                  prediction ? "🧪 Prediction: " + prediction : "❌ Error: Prediction not found.";
+
+              } catch (error) {
+                console.error("Fetch error:", error);
+                document.getElementById("prediction").innerText = "⚠️ Error sending image to server.";
+              }
+            };
+            blobReader.readAsDataURL(blob);
+          }, "image/bmp");
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  </script>
+
+</body>
+</html>
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Brain Tumor Prediction</title>
+  <style>
+    body {
       font-family: Arial;
       background-color: #111;
       color: #fff;
@@ -23,7 +151,7 @@
   <input type="file" id="imageInput" accept="image/*"><br>
   <button onclick="uploadImage()">Predict</button>
   <div id="prediction"></div>
-
+ -->
 <!--   <script>
     async function uploadImage() {
       const file = document.getElementById('imageInput').files[0];
@@ -121,7 +249,7 @@
       reader.readAsDataURL(file);
     }
   </script> -->
-  <script>
+<!--   <script>
   async function uploadImage() {
     const file = document.getElementById('imageInput').files[0];
     if (!file) return alert("Please select an image!");
@@ -175,7 +303,7 @@
     };
     reader.readAsDataURL(file);
   }
-</script>
+</script> -->
 
 <!--   <script>
   async function uploadImage() {
