@@ -135,6 +135,62 @@
         canvas.height = img.height;
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0);
+
+        // Convert canvas to BMP blob
+        canvas.toBlob(async function (blob) {
+          const blobReader = new FileReader();
+          blobReader.onloadend = async function () {
+            const base64Image = blobReader.result.split(',')[1];
+
+            try {
+              const response = await fetch('https://btkvf1loal.execute-api.us-east-1.amazonaws.com/pre/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: base64Image })
+              });
+
+              const data = await response.json();
+              console.log("Raw API Response:", data);
+
+              let prediction;
+              if (typeof data.body === "string") {
+                const parsed = JSON.parse(data.body);
+                prediction = parsed.prediction;
+              } else {
+                prediction = data.prediction;
+              }
+
+              document.getElementById("prediction").innerText =
+                prediction ? "Prediction: " + prediction : "Error: Prediction not found.";
+
+            } catch (error) {
+              console.error("Fetch error:", error);
+              document.getElementById("prediction").innerText = "Error sending image to server.";
+            }
+          };
+          blobReader.readAsDataURL(blob);
+        }, "image/bmp");
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  }
+</script>
+
+<!--   <script>
+  async function uploadImage() {
+    const file = document.getElementById('imageInput').files[0];
+    if (!file) return alert("Please select an image!");
+
+    const reader = new FileReader();
+    reader.onload = function () {
+      const img = new Image();
+      img.onload = async function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
         
         // Convert to BMP using MIME type
         canvas.toBlob(async function (blob) {
@@ -158,7 +214,7 @@
     };
     reader.readAsDataURL(file);
   }
-</script>
+</script> -->
 
 
 <!--   </script> -->
