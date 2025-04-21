@@ -52,7 +52,7 @@
       border: 1px solid #30363d;
       padding: 20px;
       width: 80%;
-      max-width: 400px;
+      max-width: 300px;
       margin-left: auto;
       margin-right: auto;
       border-radius: 8px;
@@ -61,7 +61,7 @@
 </head>
 <body>
 
-  <h2>🧠 Brain Tumor Detection</h2>
+  <h2> Brain Tumor Detection</h2>
   <input type="file" id="imageInput" accept="image/*"><br>
   <button onclick="uploadImage()">📤 Predict</button>
   <div id="prediction">Upload an image to get prediction</div>
@@ -105,11 +105,11 @@
                 }
 
                 document.getElementById("prediction").innerText =
-                  prediction ? "🧪 Prediction: " + prediction : "❌ Error: Prediction not found.";
+                  prediction ? " Prediction: " + prediction : "Error: Prediction not found.";
 
               } catch (error) {
                 console.error("Fetch error:", error);
-                document.getElementById("prediction").innerText = "⚠️ Error sending image to server.";
+                document.getElementById("prediction").innerText = "Error sending image to server.";
               }
             };
             blobReader.readAsDataURL(blob);
